@@ -56,6 +56,7 @@ data/
 dronedet-train --data data/ --out runs/seed42 --seed 42 --synthetic 139
 ```
 
+- **The paper's exact partition** is in [`splits/paper_grouped_split.csv`](splits/README.md).
 - **Split by source recording, not by clip.** All clips cut from one recording, and all mixtures made from it, go into the same partition. A clip-level shuffle leaks recordings into the test set and inflates the score.
 - **The first 3 s of each file are used.** Cut long recordings into 3-s clips first.
 - **Recipe (as in the paper):**
