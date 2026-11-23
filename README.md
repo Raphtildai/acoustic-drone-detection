@@ -68,7 +68,11 @@ dronedet-train --data data/ --out runs/seed42 --seed 42 --synthetic 139
 - **`--synthetic N`** adds N physics-informed synthetic drone clips: a blade-pass harmonic series, propagation delay and attenuation, and a noise floor. `dronedet-synth --backgrounds <folder>` writes such clips mixed into your own background recordings, which is more realistic.
 - **Ablations:** `--no-specaug` and `--no-sampler`.
 
-The paper trained on the DroneAudioDataset (positives and noise), selected UrbanSound8K classes and three public drone videos. Check each dataset's licence before use: the DroneAudioDataset licence excludes security and surveillance applications.
+What the paper trained on:
+- **Drone clips:** the DroneAudioDataset and public drone video and flyover recordings.
+- **Non-drone clips:** the DroneAudioDataset's ESC-50 and Speech Commands noise slices, seven UrbanSound8K classes, and silence.
+
+See [MODEL_CARD.md](MODEL_CARD.md) for the full list. Check each dataset's licence before use: the DroneAudioDataset licence excludes security and surveillance applications, and UrbanSound8K and ESC-50 are non-commercial.
 
 ## Evaluate
 
@@ -115,7 +119,20 @@ p = predict_proba(model, window_features(y, cutoff_hz=2000, fe=fe)[None])[0]
 
 ## Pretrained weights
 
-Not included yet. The paper's checkpoints were trained on data whose licences restrict use, and their release is being clarified. Until then, train your own with the recipe above.
+The paper's five detector checkpoints (seeds 42–46, about 1.9 MB each) are assets of the
+[v0.1.0 release](https://github.com/Raphtildai/acoustic-drone-detection/releases/tag/v0.1.0):
+
+```bash
+base=https://github.com/Raphtildai/acoustic-drone-detection/releases/download/v0.1.0
+mkdir -p weights && cd weights
+for s in 42 43 44 45 46; do curl -LO $base/dronedet-v0.1.0-seed$s.pth; done
+curl -LO $base/SHA256SUMS && sha256sum -c SHA256SUMS && cd ..
+dronedet-detect recording.wav --checkpoint weights/dronedet-v0.1.0-seed42.pth --lowpass 2000 --plot timeline.png
+```
+
+- **More than one checkpoint:** pass several to `dronedet-eval` to get mean ± std, as in the paper.
+- **Details:** [MODEL_CARD.md](MODEL_CARD.md) covers training data, results, limitations and intended use.
+- **Licence:** the weights are **CC BY-NC 4.0 with no military, defence, security or surveillance use**, inherited from the training data ([WEIGHTS_LICENSE.md](WEIGHTS_LICENSE.md)). The code itself is MIT.
 
 ## What is not here
 
@@ -157,4 +174,6 @@ pip install -e ".[test]" && pytest -q        # about a minute on a CPU
 
 ## Licence
 
-MIT (see `LICENSE`). Datasets used to train models keep their own licences.
+- **Code:** MIT (see `LICENSE`).
+- **Pretrained weights:** CC BY-NC 4.0 with a use restriction (see `WEIGHTS_LICENSE.md`).
+- **Datasets:** any dataset you use for training keeps its own licence.

@@ -6,3 +6,5 @@ data/
 *.pth
 feature_cache/
 .pytest_cache/
+release/
+weights/
